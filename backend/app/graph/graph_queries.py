@@ -11,8 +11,9 @@ def find_node(search_term):
         any(alias IN coalesce(n.aliases, [])
             WHERE toLower(alias) = toLower($search))
 
-    RETURN n.name as name,
-           labels(n)[0] as node_type
+    RETURN
+        n.name as name,
+        labels(n)[0] as node_type
     LIMIT 1
     """
 
@@ -30,13 +31,19 @@ def find_node(search_term):
             "name": result["name"],
             "type": result["node_type"]
         }
-    
+
+
 def get_node_dependencies(node_name):
 
     query = """
-    MATCH (n {name:$node_name})-[r]->(m)
-    RETURN type(r) as relationship,
-           m.name as dependency
+    MATCH (n)
+    WHERE toLower(n.name) = toLower($node_name)
+
+    MATCH (n)-[r]->(m)
+
+    RETURN
+        type(r) as relationship,
+        m.name as dependency
     """
 
     results = []
