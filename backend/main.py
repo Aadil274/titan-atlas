@@ -1,12 +1,15 @@
 from fastapi import FastAPI
 
+from app.api.atlas import router as atlas_router
+
 app = FastAPI(
-    title="TITAN-ATLAS",
-    version="0.1"
+    title="TITAN-ATLAS"
 )
+
+app.include_router(atlas_router)
 
 @app.get("/")
 def root():
     return {
-        "message": "TITAN-ATLAS API Running"
+        "status": "running"
     }
