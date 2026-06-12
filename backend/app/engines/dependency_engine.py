@@ -9,43 +9,53 @@ def get_dependency_chain(search_term):
     if not node:
         return None
 
-    node_name = node["name"]
+    current = node["name"]
 
-    query = """
-    MATCH path =
-    (n {name:$node_name})
-    <-[:DEPENDS_ON|HOSTS|SUPPLIES*1..5]-
-    (m)
+    chain = [current]
 
-    RETURN path
-    ORDER BY length(path) DESC
-    LIMIT 1
-    """
+    visited = set()
+    visited.add(current)
 
     with neo4j_conn.driver.session() as session:
+        
+        direct_dependencies = []
 
-        result = session.run(
-            query,
-            node_name=node_name
-        ).single()
+        while True:
 
-        if not result:
-            return {
-                "node": node_name,
-                "direct_dependencies": [],
-                "full_dependency_chain": [node_name],
-                "depth": 0
-            }
+            query = """
+            MATCH (n {name:$node_name})-[:DEPENDS_ON]->(m)
+            RETURN m.name AS dependency
+            LIMIT 1
+            """
 
-        path = result["path"]
+            result = session.run(
+                query,
+                node_name=current
+            ).single()
 
-        chain = []
+            if not result:
+                break
 
-        for node in path.nodes:
-            chain.append(node["name"])
+            dependency = result["dependency"]
 
-        return {
-            "node": node_name,
-            "full_dependency_chain": chain,
-            "depth": len(chain) - 1
-        }
+            if not dependency:
+                break
+
+            if dependency in visited:
+                break
+
+            if len(chain) == 1:
+                direct_dependencies.append(dependency)
+
+            chain.append(dependency)
+
+            visited.add(dependency)
+
+            current = dependency
+
+    return {
+        "node": node["name"],
+        "direct_dependencies": direct_dependencies,
+        "full_dependency_chain": chain,
+        "depth": len(chain) - 1
+    }
