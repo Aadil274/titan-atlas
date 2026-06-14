@@ -1,21 +1,18 @@
 from fastapi import APIRouter, HTTPException
 
+from app.engines.dashboard_engine import (
+    build_dashboard
+)
+
 from app.graph.graph_queries import (
     find_node,
     get_node_dependencies
 )
 
-from app.engines.atlas_engine import (
-    analyze_impact
-)
+from app.engines.atlas_engine import analyze_impact
+from app.engines.critical_node_engine import get_critical_nodes
+from app.engines.dependency_engine import get_dependency_chain
 
-from app.engines.critical_node_engine import (
-    get_critical_nodes
-)
-
-from app.engines.dependency_engine import (
-    get_dependency_chain
-)
 
 router = APIRouter(
     prefix="/atlas",
@@ -23,72 +20,61 @@ router = APIRouter(
 )
 
 
-@router.get("/node/{search_term}")
-def get_node(search_term: str):
+def validate_result(result):
 
-    node = find_node(search_term)
-
-    if not node:
+    if not result:
         raise HTTPException(
             status_code=404,
             detail="Node not found"
         )
 
-    dependencies = get_node_dependencies(
-        node["name"]
+    if isinstance(result, dict) and "error" in result:
+        raise HTTPException(
+            status_code=404,
+            detail=result["error"]
+        )
+
+    return result
+
+
+@router.get("/node/{search_term}")
+def get_node(search_term: str):
+
+    node = validate_result(
+        find_node(search_term)
     )
 
     return {
         "node": node["name"],
         "type": node["type"],
-        "dependencies": dependencies
+        "dependencies": get_node_dependencies(
+            node["name"]
+        )
     }
 
 
 @router.get("/impact/{search_term}")
 def get_impact(search_term: str):
 
-    result = analyze_impact(
-        search_term
+    return validate_result(
+        analyze_impact(search_term)
     )
 
-    if "error" in result:
-        raise HTTPException(
-            status_code=404,
-            detail=result["error"]
-        )
 
-    return result
+@router.get("/dependencies/{search_term}")
+def dependencies(search_term: str):
 
-
-@router.get("/analysis/{search_term}")
-def get_analysis(search_term: str):
-
-    result = analyze_impact(
-        search_term
+    return validate_result(
+        get_dependency_chain(search_term)
     )
 
-    if "error" in result:
-        raise HTTPException(
-            status_code=404,
-            detail=result["error"]
-        )
-
-    return result
 
 @router.get("/critical")
 def critical_nodes():
 
     return get_critical_nodes()
 
-@router.get("/dependencies/{search_term}")
-def dependencies(search_term: str):
+@router.get("/dashboard")
+def dashboard():
 
-    result = get_dependency_chain(search_term)
-
-    if not result:
-        return {
-            "error": "Node not found"
-        }
-
-    return result
+    return build_dashboard()

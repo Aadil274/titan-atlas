@@ -63,3 +63,19 @@ def get_node_dependencies(node_name):
             })
 
     return results
+
+def get_all_nodes():
+
+    query = """
+    MATCH (n)
+    RETURN n.name AS name
+    """
+
+    with neo4j_conn.driver.session() as session:
+
+        result = session.run(query)
+
+        return [
+            record["name"]
+            for record in result
+        ]
