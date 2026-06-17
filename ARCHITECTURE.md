@@ -47,48 +47,63 @@ Functions:
 
 app/
 
-api/
+    ai/
+    - alternative_engine.py
+    - executive_briefs.py
+    - explanation_engine.py
+    - narrative_engine.py
+    - reasoning_enigne.py
+    - recommendation_engine.py
+    - report_generator.py
 
-- atlas.py
-- titan.py
+    api/
 
-engines/
+    - atlas.py
+    - titan.py
 
-- atlas_engine.py
-- dependency_engine.py
-- critical_node_engine.py
-- hidden_dependency_engine.py
-- resilience_score_engine.py
-- risk_ranking_engine.py
-- portfolio_risk_engine.py
-- systemic_risk_engine.py
-- dashboard_engine.py
-- titan_engine.py
-- multi_failure_engine.py
+    engines/
 
-ai/
+    - atlas_engine.py
+    - dependency_engine.py
+    - critical_node_engine.py
+    - hidden_dependency_engine.py
+    - resilience_score_engine.py
+    - risk_ranking_engine.py
+    - portfolio_risk_engine.py
+    - systemic_risk_engine.py
+    - dashboard_engine.py
+    - titan_engine.py
+    - multi_failure_engine.py
+    - comparative_risk_engine.py
+    - counterfactual_engine.py
+    - impact_engine.py
+    - multi_simulation_engine.py
+    - network_summary_engine.py
+    - network_discovery_engine.py
+    - resilience_engine.py
+    - risk_engine.py
+    - risk_exposure_engine.py
+    - root_cause_engine.py
+    - scenario_comparison_engine.py
+    - vulnerability_engine.py
 
-- executive_briefs.py
-- narrative_engine.py
-- query_analyzer.py
+    graph/
 
-graph/
+    - graph_queries.py
+    - graph_builder.py
 
-- graph_queries.py
-- graph_builder.py
+    simulation/
 
-simulation/
+    - scenario_engine.py
+    - timeline_generator.py
 
-- scenario_engine.py
-- timeline_generator.py
+    database/
 
-database/
+    - neo4j.py
 
-- neo4j.py
+    models/
 
-models/
-
-utils/
+    utils/
 
 ---
 
