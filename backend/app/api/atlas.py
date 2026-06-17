@@ -1,7 +1,11 @@
 from fastapi import APIRouter, HTTPException
 
+from app.engines.network_summary_engine import (
+    generate_network_summary
+)
+
 from app.engines.dashboard_engine import (
-    build_dashboard
+    generate_dashboard
 )
 
 from app.graph.graph_queries import (
@@ -77,4 +81,9 @@ def critical_nodes():
 @router.get("/dashboard")
 def dashboard():
 
-    return build_dashboard()
+    return generate_dashboard()
+
+@router.get("/network-summary")
+def network_summary():
+
+    return generate_network_summary()
